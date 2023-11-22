@@ -40,7 +40,7 @@ public class AbstractLiquid
         if (al1.color.a == 0 && al2.color.a == 0)
             newcolor = new Color(0, 0, 0, 0);
         else
-            newcolor = Color.Lerp(al1.color, al2.color, al1.color.a* al1.quantity / (al1.color.a* al1.quantity + al2.color.a* al2.quantity));
+            newcolor = Color.Lerp(al1.color, al2.color, al2.color.a* al2.quantity / (al1.color.a* al1.quantity + al2.color.a* al2.quantity));
 
         return new AbstractLiquid(newcolor, al1.quantity + al2.quantity, MergeTypes(al1.t, al2.t));
     }

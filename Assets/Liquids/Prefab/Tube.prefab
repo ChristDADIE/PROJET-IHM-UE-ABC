@@ -26,7 +26,6 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2612151879315983521}
-  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -2.58, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -35,6 +34,7 @@ Transform:
   - {fileID: 6793806133845007427}
   - {fileID: 6472555809226096676}
   m_Father: {fileID: 0}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &212825641621591472
 Rigidbody:
@@ -43,21 +43,10 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2612151879315983521}
-  serializedVersion: 4
+  serializedVersion: 2
   m_Mass: 1
   m_Drag: 0
   m_AngularDrag: 0.01
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 0
-  m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
@@ -71,17 +60,9 @@ MeshCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2612151879315983521}
   m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
   m_IsTrigger: 0
-  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 5
+  serializedVersion: 4
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -2432090755550338912, guid: 165e8f828d30c3341b83be21830cf46f, type: 3}
@@ -99,8 +80,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   liquid: {fileID: 1032104405273474481}
   spawnPosition: {x: 0, y: 2, z: 0}
-  particleLiquid: {fileID: 3391641961036673588, guid: 154ba365419319446ac071c94186235d,
-    type: 3}
+  particleLiquid: {fileID: 3391641961036673588, guid: 154ba365419319446ac071c94186235d, type: 3}
   particlePerUnit: 25
   randomMovements: {x: 0, y: 0, z: 0}
 --- !u!1 &4586336671709016604
@@ -128,13 +108,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4586336671709016604}
-  serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3420512633806384922}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &1189362046589314724
 MeshFilter:
@@ -213,13 +193,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4786544147937151717}
-  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3420512633806384922}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1032104405273474481
 MonoBehaviour:
@@ -234,7 +214,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   volume: 0.5
-  color: {r: 0, g: 0.6981132, b: 0.20110145, a: 0}
+  color: {r: 0, g: 0.6981132, b: 0.20110145, a: 1}
   shapes:
   - {fileID: -2432090755550338912, guid: 165e8f828d30c3341b83be21830cf46f, type: 3}
   quantity: 0.5
@@ -244,8 +224,7 @@ MonoBehaviour:
   delta: 0.05
   gravity: 1
   center: {x: 0, y: -0.5, z: 0}
-  triggerMesh: {fileID: -2432090755550338912, guid: 86d2eb6b5a87a0143b6f0e80ac554b12,
-    type: 3}
+  triggerMesh: {fileID: -2432090755550338912, guid: 86d2eb6b5a87a0143b6f0e80ac554b12, type: 3}
   calm: 0
   output: {x: 0, y: 1, z: 0}
   input: {fileID: 1154376194872562333}
@@ -307,16 +286,8 @@ SphereCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4786544147937151717}
   m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
   m_IsTrigger: 1
-  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
+  serializedVersion: 2
   m_Radius: 0.2
   m_Center: {x: 0, y: 1.4, z: 0}

@@ -57,7 +57,9 @@ public class OutsideParticleManager : MonoBehaviour
             {
                 if(recipient.Quantity / recipient.volume + pl.Property.quantity <= 1) // ne deborde pas
                 {
+                    Debug.Log(recipient.Property.color);
                     recipient.Property = AbstractLiquid.merge(recipient.Property, pl.Property);
+                    Debug.Log(recipient.Property.color);
                     Destroy(pl.gameObject);
                     RemoveParticle(pl);
                 }

@@ -24,7 +24,7 @@ public class Liquide : MonoBehaviour
     public AbstractLiquid Property
     {
         get
-        {
+        { 
             return new AbstractLiquid(GetComponent<Renderer>().material.color, quantity*volume, t);
         }
         set

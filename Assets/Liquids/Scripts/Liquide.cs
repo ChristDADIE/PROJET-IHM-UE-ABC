@@ -26,11 +26,11 @@ public class Liquide : MonoBehaviour
     {
         get
         {
-            return new AbstractLiquid(GetComponent<Renderer>().material.color, quantity*volume, t);
+            return new AbstractLiquid(GetComponent<Renderer>().material.color, quantity * volume, t);
         }
         set
         {
-            quantity = value.quantity/volume;
+            quantity = value.quantity / volume;
             GetComponent<Renderer>().material.color = value.color;
             this.t = value.t;
         }
@@ -77,7 +77,7 @@ public class Liquide : MonoBehaviour
 
     [SerializeField]
     public Vector3 output;
-    
+
     public bool Calm
     {
         get
@@ -119,17 +119,17 @@ public class Liquide : MonoBehaviour
     }
 
     [NonSerialized]
-    public Vector3 oldAcceleration = new Vector3(0,0,0);
+    public Vector3 oldAcceleration = new Vector3(0, 0, 0);
 
     void UpdateReference()
     {
-        for(int i = 0;i != shapes.Length;++i)
+        for (int i = 0; i != shapes.Length; ++i)
         {
             if (!shapes[i].isReadable)
                 Debug.Log("Erreur, le mesh " + i + " n'est pas en mode readable");
         }
-        
-        
+
+
         references = new Vector3[shapes.Length][];
         for (int i = 0; i != shapes.Length; ++i)
         {
@@ -138,9 +138,9 @@ public class Liquide : MonoBehaviour
             List<Vector3> vertices = new();
             for (int j = 0; j != vertices_base.Length; ++j)
             {
-                vertices_base[j] = vertices_base[j]+delta*(center - vertices_base[j]).normalized;
+                vertices_base[j] = vertices_base[j] + delta * (center - vertices_base[j]).normalized;
             }
-            for(int j = 0;j != triangles_base.Length;++j)
+            for (int j = 0; j != triangles_base.Length; ++j)
             {
                 vertices.Add(vertices_base[triangles_base[j]]);
             }
@@ -148,10 +148,10 @@ public class Liquide : MonoBehaviour
         }
     }
 
-    void Fuse(Vector3[][] meshs,Mesh target)
+    void Fuse(Vector3[][] meshs, Mesh target)
     {
         int total = 0;
-        for(int i = 0;i != meshs.Length;++i)
+        for (int i = 0; i != meshs.Length; ++i)
         {
             total += meshs[i].Length;
         }
@@ -160,13 +160,13 @@ public class Liquide : MonoBehaviour
         int[] triangles = new int[total];
 
         int currentVerticesIndex = 0;
-        for (int i = 0;i != meshs.Length;++i)
+        for (int i = 0; i != meshs.Length; ++i)
         {
-            for (int j = 0;j != meshs[i].Length;++j)
+            for (int j = 0; j != meshs[i].Length; ++j)
             {
                 vertices[currentVerticesIndex++] = meshs[i][j];
             }
-            
+
         }
         for (int i = 0; i != total; ++i)
         {
@@ -187,7 +187,7 @@ public class Liquide : MonoBehaviour
         return verticeInPlan;
     }
 
-    void CalculateCut1(Plane plan,List<(Vector3, Vector3, Vector3)> listMetaTriangles, Vector3 a,Vector3 b,Vector3 c)
+    void CalculateCut1(Plane plan, List<(Vector3, Vector3, Vector3)> listMetaTriangles, Vector3 a, Vector3 b, Vector3 c)
     {
         plan.Raycast(new Ray(a, c - a), out float distanceD);
         plan.Raycast(new Ray(a, b - a), out float distanceE);
@@ -222,10 +222,10 @@ public class Liquide : MonoBehaviour
     }
 
     Vector3 pointCut;
-    void UpdateLiquid(Vector3 position,Vector3 direction)
+    void UpdateLiquid(Vector3 position, Vector3 direction)
     {
         liquid.Clear();
-        for (int index_ref = 0; index_ref != references.Length;++index_ref)
+        for (int index_ref = 0; index_ref != references.Length; ++index_ref)
         {
 
             Vector3[] target = references[index_ref];
@@ -234,25 +234,25 @@ public class Liquide : MonoBehaviour
 
             pointCut = new Vector3(0, 0, 0);
 
-            List<(Vector3,Vector3,Vector3)> listMetaTriangles = new();
+            List<(Vector3, Vector3, Vector3)> listMetaTriangles = new();
 
 
             for (int i = 0; i < target.Length; i += 3)
             {
                 int permutation = 0;
                 if (verticeInPlan[i]) permutation += 1 << 0;
-                if (verticeInPlan[i+1]) permutation += 1 << 1;
-                if (verticeInPlan[i+2]) permutation += 1 << 2;
+                if (verticeInPlan[i + 1]) permutation += 1 << 1;
+                if (verticeInPlan[i + 2]) permutation += 1 << 2;
 
                 Vector3 a, b, c;
                 int cut = 0;
                 switch (permutation)
                 {
                     case 0:
-                        listMetaTriangles.Add((target[i], target[i+1], target[i+2]));
+                        listMetaTriangles.Add((target[i], target[i + 1], target[i + 2]));
                         continue;
                     case 1:
-                        (a, b, c) = (target[i + 1], target[i+2], target[i]); cut = 2; break;
+                        (a, b, c) = (target[i + 1], target[i + 2], target[i]); cut = 2; break;
                     case 2:
                         (a, b, c) = (target[i + 2], target[i], target[i + 1]); cut = 2; break;
                     case 3:
@@ -271,28 +271,28 @@ public class Liquide : MonoBehaviour
                 if (cut == 1)
                 {
 
-                    CalculateCut1(plan,listMetaTriangles, a, b, c);
+                    CalculateCut1(plan, listMetaTriangles, a, b, c);
                 }
                 else
                 {
-                    CalculateCut2(plan,listMetaTriangles, a, b, c);
+                    CalculateCut2(plan, listMetaTriangles, a, b, c);
                 }
 
             }
             Vector3[] listVertices = new Vector3[listMetaTriangles.Count * 3];
 
-            for(int i = 0;i != listMetaTriangles.Count;++i)
+            for (int i = 0; i != listMetaTriangles.Count; ++i)
             {
                 int j = i * 3;
                 listVertices[j] = listMetaTriangles[i].Item1;
                 listVertices[j + 1] = listMetaTriangles[i].Item2;
                 listVertices[j + 2] = listMetaTriangles[i].Item3;
             }
-           
+
 
             liquids[index_ref] = listVertices;
         }
-        Fuse(liquids,liquid);
+        Fuse(liquids, liquid);
         liquid.RecalculateNormals();
         //liquid.Optimize();
 
@@ -319,17 +319,17 @@ public class Liquide : MonoBehaviour
         return Quaternion.Inverse(transform.rotation) * new Vector3(0, 1, 0);
     }
 
-    
+
     private void FixedUpdate()
     {
-        if(movements != null && !calm)
+        if (movements != null && !calm)
         {
-            Vector3 acceleration = (movements.velocity - oldSpeed)/mass + GetDown() * Time.fixedDeltaTime*gravity;
+            Vector3 acceleration = (movements.velocity - oldSpeed) / mass + GetDown() * Time.fixedDeltaTime * gravity;
             oldAcceleration = acceleration;
             oldSpeed = movements.velocity;
             shaking = acceleration.magnitude;
             speed += acceleration;
-            speed = Vector3.ProjectOnPlane(speed, direction) * Mathf.Pow(0.999f,viscosity / (Time.fixedDeltaTime*(quantity+0.2f)));
+            speed = Vector3.ProjectOnPlane(speed, direction) * Mathf.Pow(0.999f, viscosity / (Time.fixedDeltaTime * (quantity + 0.2f)));
             direction += speed;
             direction = direction.normalized;
             Vector3 position = direction * scale + center;
@@ -418,6 +418,6 @@ public class Liquide : MonoBehaviour
         }
         needUpdate = false;
 
-        
+
     }
 }

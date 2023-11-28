@@ -70,6 +70,8 @@ public class Liquide : MonoBehaviour
     [SerializeField]
     Mesh triggerMesh;
 
+    Vector3[] triggerVertices;
+
     [SerializeField]
     bool calm;
 
@@ -98,8 +100,7 @@ public class Liquide : MonoBehaviour
     [SerializeField]
     Collider input;
 
-
-    Mesh[] reference;
+    Vector3[][] references;
     Mesh liquid;
     Vector3[][] liquids;
 
@@ -129,23 +130,21 @@ public class Liquide : MonoBehaviour
         }
         
         
-        reference = new Mesh[shapes.Length];
+        references = new Vector3[shapes.Length][];
         for (int i = 0; i != shapes.Length; ++i)
         {
-            reference[i] = new Mesh();
-            Vector3[] vertices = new Vector3[shapes[i].vertexCount];
-            int[] triangles = new int[shapes[i].triangles.Length];
-
-            for (int j = 0; j != shapes[i].vertexCount; ++j)
+            Vector3[] vertices_base = shapes[i].vertices;
+            int[] triangles_base = shapes[i].triangles;
+            List<Vector3> vertices = new();
+            for (int j = 0; j != vertices_base.Length; ++j)
             {
-                vertices[j] = shapes[i].vertices[j]+delta*(center- shapes[i].vertices[j]).normalized;
+                vertices_base[j] = vertices_base[j]+delta*(center - vertices_base[j]).normalized;
             }
-            for(int j = 0;j != shapes[i].triangles.Length;++j)
+            for(int j = 0;j != triangles_base.Length;++j)
             {
-                triangles[j] = shapes[i].triangles[j];
+                vertices.Add(vertices_base[triangles_base[j]]);
             }
-            reference[i].vertices = vertices;
-            reference[i].triangles = triangles;
+            references[i] = vertices.ToArray();
         }
     }
 
@@ -177,13 +176,13 @@ public class Liquide : MonoBehaviour
         target.triangles = triangles;
     }
 
-    bool[] CalculateVerticesInPlan(Vector3 position, Vector3 direction, Mesh target)
+    bool[] CalculateVerticesInPlan(Vector3 position, Vector3 direction, Vector3[] target)
     {
-        bool[] verticeInPlan = new bool[target.vertexCount];
+        bool[] verticeInPlan = new bool[target.Length];
 
-        for (int i = 0; i < target.vertexCount; ++i)
+        for (int i = 0; i < target.Length; ++i)
         {
-            verticeInPlan[i] = Vector3.Dot(target.vertices[i] - position, direction) > 0;
+            verticeInPlan[i] = Vector3.Dot(target[i] - position, direction) > 0;
         }
         return verticeInPlan;
     }
@@ -226,12 +225,10 @@ public class Liquide : MonoBehaviour
     void UpdateLiquid(Vector3 position,Vector3 direction)
     {
         liquid.Clear();
-        for (int index_ref = 0; index_ref != reference.Length;++index_ref)
+        for (int index_ref = 0; index_ref != references.Length;++index_ref)
         {
 
-            Mesh target = reference[index_ref];
-            Vector3[] vertices_target = target.vertices;
-            int[] triangles_target = target.triangles;
+            Vector3[] target = references[index_ref];
 
             bool[] verticeInPlan = CalculateVerticesInPlan(position, direction, target);
 
@@ -240,32 +237,32 @@ public class Liquide : MonoBehaviour
             List<(Vector3,Vector3,Vector3)> listMetaTriangles = new();
 
 
-            for (int i = 0; i < triangles_target.Length; i += 3)
+            for (int i = 0; i < target.Length; i += 3)
             {
                 int permutation = 0;
-                if (verticeInPlan[triangles_target[i]]) permutation += 1 << 0;
-                if (verticeInPlan[triangles_target[i+1]]) permutation += 1 << 1;
-                if (verticeInPlan[triangles_target[i+2]]) permutation += 1 << 2;
+                if (verticeInPlan[i]) permutation += 1 << 0;
+                if (verticeInPlan[i+1]) permutation += 1 << 1;
+                if (verticeInPlan[i+2]) permutation += 1 << 2;
 
                 Vector3 a, b, c;
                 int cut = 0;
                 switch (permutation)
                 {
                     case 0:
-                        listMetaTriangles.Add((vertices_target[triangles_target[i]], vertices_target[triangles_target[i+1]], vertices_target[triangles_target[i+2]]));
+                        listMetaTriangles.Add((target[i], target[i+1], target[i+2]));
                         continue;
                     case 1:
-                        (a, b, c) = (vertices_target[triangles_target[i + 1]], vertices_target[triangles_target[i+2]], vertices_target[triangles_target[i]]); cut = 2; break;
+                        (a, b, c) = (target[i + 1], target[i+2], target[i]); cut = 2; break;
                     case 2:
-                        (a, b, c) = (vertices_target[triangles_target[i + 2]], vertices_target[triangles_target[i]], vertices_target[triangles_target[i + 1]]); cut = 2; break;
+                        (a, b, c) = (target[i + 2], target[i], target[i + 1]); cut = 2; break;
                     case 3:
-                        (a, b, c) = (vertices_target[triangles_target[i + 2]], vertices_target[triangles_target[i]], vertices_target[triangles_target[i + 1]]); cut = 1; break;
+                        (a, b, c) = (target[i + 2], target[i], target[i + 1]); cut = 1; break;
                     case 4:
-                        (a, b, c) = (vertices_target[triangles_target[i]], vertices_target[triangles_target[i + 1]], vertices_target[triangles_target[i + 2]]); cut = 2; break;
+                        (a, b, c) = (target[i], target[i + 1], target[i + 2]); cut = 2; break;
                     case 5:
-                        (a, b, c) = (vertices_target[triangles_target[i + 1]], vertices_target[triangles_target[i + 2]], vertices_target[triangles_target[i]]); cut = 1; break;
+                        (a, b, c) = (target[i + 1], target[i + 2], target[i]); cut = 1; break;
                     case 6:
-                        (a, b, c) = (vertices_target[triangles_target[i]], vertices_target[triangles_target[i + 1]], vertices_target[triangles_target[i + 2]]); cut = 1; break;
+                        (a, b, c) = (target[i], target[i + 1], target[i + 2]); cut = 1; break;
                     default:
                         continue;
                 }
@@ -304,7 +301,7 @@ public class Liquide : MonoBehaviour
     {
         UpdateReference();
         liquid = new Mesh();
-        liquids = new Vector3[reference.Length][];
+        liquids = new Vector3[references.Length][];
 
         GetComponent<MeshFilter>().mesh = liquid;
         direction = (Quaternion.Inverse(transform.rotation)) * (new Vector3(0, 1, 0));
@@ -312,7 +309,7 @@ public class Liquide : MonoBehaviour
         speed = new Vector3(0, 0, 0);
         shaking = 0;
         previousQuantity = -1;
-
+        triggerVertices = triggerMesh.vertices;
         GetComponent<Renderer>().material.color = color;
 
     }
@@ -342,7 +339,7 @@ public class Liquide : MonoBehaviour
                 for (int i = 0; i != triggerMesh.vertexCount; ++i)
                 {
 
-                    if (Vector3.Dot(triggerMesh.vertices[i] - position, direction) <= 0)
+                    if (Vector3.Dot(triggerVertices[i] - position, direction) <= 0)
                     {
                         isFlowing = true;
                         break;
@@ -406,11 +403,11 @@ public class Liquide : MonoBehaviour
             previousQuantity = quantity;
             float borneMin = float.MaxValue;
             float borneMax = float.MinValue;
-            for (int i = 0; i != reference.Length; ++i)
+            for (int i = 0; i != references.Length; ++i)
             {
-                for (int j = 0; j != reference[i].vertexCount; ++j)
+                for (int j = 0; j != references[i].Length; ++j)
                 {
-                    float value = Vector3.Dot(direction, reference[i].vertices[j] - center);
+                    float value = Vector3.Dot(direction, references[i][j] - center);
                     if (value < borneMin) borneMin = value;
                     if (value > borneMax) borneMax = value;
                 }

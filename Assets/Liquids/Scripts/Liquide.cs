@@ -269,7 +269,7 @@ public class Liquide : MonoBehaviour
                     default:
                         continue;
                 }
-                Plane plan = new Plane(direction, position);
+                Plane plan = new(direction, position);
 
                 if (cut == 1)
                 {

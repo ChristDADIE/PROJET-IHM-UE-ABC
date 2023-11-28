@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MainManager : MonoBehaviour
 {
-    enum context
+    public enum context
     {
         mainMenu,
         selection,
@@ -12,11 +12,25 @@ public class MainManager : MonoBehaviour
     };
 
     context globalContext;
+    public context GlobalContext
+    {
+        set
+        {
+            globalContext = value;
+        }
+    }
 
 
     void Start()
     {
         globalContext = context.mainMenu;
+    }
+
+    void StartLevel(int id)
+    {
+        globalContext = context.level;
+        GetComponent<LevelManager>().Id = id;
+        GetComponent<LevelManager>().StartLevel();
     }
 
     

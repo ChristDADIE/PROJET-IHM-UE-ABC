@@ -645,30 +645,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 14.72
       objectReference: {fileID: 0}
-    - target: {fileID: 2896971912738339403, guid: 1dc64d39a349580409c1f9bcfdb7b450, type: 3}
-      propertyPath: m_Mesh
-      value: 
-      objectReference: {fileID: -2432090755550338912, guid: 73a4ade76a756a54bb3a5ca883f7b81a, type: 3}
-    - target: {fileID: 4505725088684807620, guid: 1dc64d39a349580409c1f9bcfdb7b450, type: 3}
-      propertyPath: m_Mesh
-      value: 
-      objectReference: {fileID: -2432090755550338912, guid: a874427b720b72b42b7e7ec46594b908, type: 3}
     - target: {fileID: 7032919751564673300, guid: 1dc64d39a349580409c1f9bcfdb7b450, type: 3}
       propertyPath: m_Name
       value: Fiole
       objectReference: {fileID: 0}
-    - target: {fileID: 7036658527395655887, guid: 1dc64d39a349580409c1f9bcfdb7b450, type: 3}
-      propertyPath: triggerMesh
-      value: 
-      objectReference: {fileID: -2432090755550338912, guid: 015e31a8718cbdd4f9fff3f0c17e444b, type: 3}
-    - target: {fileID: 7036658527395655887, guid: 1dc64d39a349580409c1f9bcfdb7b450, type: 3}
-      propertyPath: shapes.Array.data[0]
-      value: 
-      objectReference: {fileID: -2432090755550338912, guid: 09275fec23961804490c2656104b19fe, type: 3}
-    - target: {fileID: 7036658527395655887, guid: 1dc64d39a349580409c1f9bcfdb7b450, type: 3}
-      propertyPath: shapes.Array.data[1]
-      value: 
-      objectReference: {fileID: -2432090755550338912, guid: 8b9d5da867ed8d84b9710c3a5fd81a4e, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1dc64d39a349580409c1f9bcfdb7b450, type: 3}
 --- !u!1001 &8113177362854445992

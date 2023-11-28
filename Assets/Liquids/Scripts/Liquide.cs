@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 public class Liquide : MonoBehaviour
 {
@@ -100,7 +101,7 @@ public class Liquide : MonoBehaviour
 
     Mesh[] reference;
     Mesh liquid;
-    Mesh[] liquids;
+    Vector3[][] liquids;
 
     Vector3 direction;
     Vector3 speed;
@@ -148,187 +149,168 @@ public class Liquide : MonoBehaviour
         }
     }
 
-    Mesh Fuse(Mesh[] meshs)
+    void Fuse(Vector3[][] meshs,Mesh target)
     {
-        Mesh total = new Mesh();
-        int totalVertices = 0;
-        int totalTriangles = 0;
+        int total = 0;
         for(int i = 0;i != meshs.Length;++i)
         {
-            totalVertices += meshs[i].vertexCount;
-            totalTriangles += meshs[i].triangles.Length;
+            total += meshs[i].Length;
         }
 
-        Vector3[] vertices = new Vector3[totalVertices];
-        int[] triangles = new int[totalTriangles];
+        Vector3[] vertices = new Vector3[total];
+        int[] triangles = new int[total];
 
         int currentVerticesIndex = 0;
-        int currentVerticesDelta = 0;
-        int currentTrianglesIndex = 0;
         for (int i = 0;i != meshs.Length;++i)
         {
-            for(int j = 0;j != meshs[i].vertexCount;++j)
+            for (int j = 0;j != meshs[i].Length;++j)
             {
-                vertices[currentVerticesIndex++] = meshs[i].vertices[j];
+                vertices[currentVerticesIndex++] = meshs[i][j];
             }
-            for(int j = 0;j != meshs[i].triangles.Length;++j)
-            {
-                triangles[currentTrianglesIndex++] = meshs[i].triangles[j] + currentVerticesDelta;
-            }
-            currentVerticesDelta = currentVerticesIndex;
+            
         }
-        total.vertices = vertices;
-        total.triangles = triangles;
-        return total;
+        for (int i = 0; i != total; ++i)
+        {
+            triangles[i] = i;
+        }
+        target.vertices = vertices;
+        target.triangles = triangles;
     }
 
-
-    class Triangle
+    bool[] CalculateVerticesInPlan(Vector3 position, Vector3 direction, Mesh target)
     {
-        static Vector3 pointCut = new Vector3(0,0,0);
-        public static void Clear()
+        bool[] verticeInPlan = new bool[target.vertexCount];
+
+        for (int i = 0; i < target.vertexCount; ++i)
         {
-            pointCut = new Vector3(0, 0, 0);
+            verticeInPlan[i] = Vector3.Dot(target.vertices[i] - position, direction) > 0;
         }
-        public Triangle(Vector3 a, Vector3 b, Vector3 c)
-        {
-            this.a = a;this.b = b;this.c = c;
-        }
-
-        public List<Triangle> cutAlong(Vector3 position,Vector3 direction,bool fill = true)
-        {
-            a -= position;
-            b -= position;
-            c -= position;
-
-            int permutation = 0;
-            if (Vector3.Dot(a, direction) > 0) permutation += 1 << 0;
-            if (Vector3.Dot(b, direction) > 0) permutation += 1 << 1;
-            if (Vector3.Dot(c, direction) > 0) permutation += 1 << 2;
-            a += position;
-            b += position;
-            c += position;
-            int cut;
-
-            switch(permutation)
-            {
-                case 0:
-                    
-                    return new List<Triangle>() { this };
-                case 1:
-                    (a, b, c) = (b, c, a); cut = 2; break;
-                case 2:
-                    (a, b, c) = (c, a, b); cut = 2; break;
-                case 3:
-                    (a, b, c) = (c, a, b); cut = 1; break;
-                case 4:
-                    /*(a, b, c) = (a, b, c);*/ cut = 2; break;
-                case 5:
-                    (a, b, c) = (b, c, a); cut = 1; break;
-                case 6:
-                    /*(a, b, c) = (a, b, c);*/ cut = 1; break;
-                case 7:
-                    return new List<Triangle>();
-                default:
-                    Debug.Log("Erreur, permutation non valide");
-                    cut = 0;
-                    break;
-            }
-
-            Plane plan = new Plane(direction, position);
-
-            if(cut == 1)
-            {
-                plan.Raycast(new Ray(a, c-a), out float distanceD);
-                plan.Raycast(new Ray(a, b-a), out float distanceE);
-                Vector3 d = a + (c - a).normalized * distanceD;
-                Vector3 e = a + (b - a).normalized * distanceE;
-                if(pointCut == new Vector3(0,0,0) || !fill)
-                {
-                    pointCut = e;
-                    return new List<Triangle>() { new Triangle(a, e, d) };
-                }
-                else
-                {
-                    return new List<Triangle>() { new Triangle(a, e, d),new Triangle(e,pointCut, d) };
-                }
-                
-            }
-            else
-            {
-                plan.Raycast(new Ray(a, c-a), out float distanceD);
-                plan.Raycast(new Ray(b, c-b),out float distanceE);
-                Vector3 d = a + (c - a).normalized * distanceD;
-                Vector3 e = b + (c - b).normalized * distanceE;
-                if (pointCut == new Vector3(0, 0, 0) || !fill)
-                {
-                    pointCut = e;
-                    return new List<Triangle>() { new Triangle(a,e,d),new Triangle(a,b,e)};
-                }
-                else
-                {
-                    return new List<Triangle>() { new Triangle(a, e, d), new Triangle(a, b, e), new Triangle(e, pointCut, d) };
-                }
-
-        }
-
-        }
-        public Vector3 a,b,c;
+        return verticeInPlan;
     }
+
+    void CalculateCut1(Plane plan,List<(Vector3, Vector3, Vector3)> listMetaTriangles, Vector3 a,Vector3 b,Vector3 c)
+    {
+        plan.Raycast(new Ray(a, c - a), out float distanceD);
+        plan.Raycast(new Ray(a, b - a), out float distanceE);
+        Vector3 d = a + (c - a).normalized * distanceD;
+        Vector3 e = a + (b - a).normalized * distanceE;
+        if (pointCut == new Vector3(0, 0, 0))
+        {
+            pointCut = e;
+            listMetaTriangles.Add((a, e, d));
+        }
+        else
+        {
+            listMetaTriangles.Add((a, e, d)); listMetaTriangles.Add((e, pointCut, d));
+        }
+    }
+
+    void CalculateCut2(Plane plan, List<(Vector3, Vector3, Vector3)> listMetaTriangles, Vector3 a, Vector3 b, Vector3 c)
+    {
+        plan.Raycast(new Ray(a, c - a), out float distanceD);
+        plan.Raycast(new Ray(b, c - b), out float distanceE);
+        Vector3 d = a + (c - a).normalized * distanceD;
+        Vector3 e = b + (c - b).normalized * distanceE;
+        if (pointCut == new Vector3(0, 0, 0))
+        {
+            pointCut = e;
+            listMetaTriangles.Add((a, e, d)); listMetaTriangles.Add((a, b, e));
+        }
+        else
+        {
+            listMetaTriangles.Add((a, e, d)); listMetaTriangles.Add((a, b, e)); listMetaTriangles.Add((e, pointCut, d));
+        }
+    }
+
+    Vector3 pointCut;
     void UpdateLiquid(Vector3 position,Vector3 direction)
     {
         liquid.Clear();
         for (int index_ref = 0; index_ref != reference.Length;++index_ref)
         {
-            liquids[index_ref].Clear();
-            List<Triangle> listMetaTriangles = new();
-            for (int i = 0; i < reference[index_ref].triangles.Length; i += 3)
-            {
-                listMetaTriangles.Add(new Triangle(reference[index_ref].vertices[reference[index_ref].triangles[i]],
-                    reference[index_ref].vertices[reference[index_ref].triangles[i + 1]],
-                    reference[index_ref].vertices[reference[index_ref].triangles[i + 2]]));
-            }
 
-            List<Vector3> listVertices = new();
-            List<int> listTriangles = new();
-            Triangle.Clear();
-            foreach (Triangle triangle in listMetaTriangles)
+            Mesh target = reference[index_ref];
+            Vector3[] vertices_target = target.vertices;
+            int[] triangles_target = target.triangles;
+
+            bool[] verticeInPlan = CalculateVerticesInPlan(position, direction, target);
+
+            pointCut = new Vector3(0, 0, 0);
+
+            List<(Vector3,Vector3,Vector3)> listMetaTriangles = new();
+
+
+            for (int i = 0; i < triangles_target.Length; i += 3)
             {
-                foreach (Triangle t in triangle.cutAlong(position, direction))
+                int permutation = 0;
+                if (verticeInPlan[triangles_target[i]]) permutation += 1 << 0;
+                if (verticeInPlan[triangles_target[i+1]]) permutation += 1 << 1;
+                if (verticeInPlan[triangles_target[i+2]]) permutation += 1 << 2;
+
+                Vector3 a, b, c;
+                int cut = 0;
+                switch (permutation)
                 {
-                    listTriangles.Add(listVertices.Count);
-                    listVertices.Add(t.a);
-                    listTriangles.Add(listVertices.Count);
-                    listVertices.Add(t.b);
-                    listTriangles.Add(listVertices.Count);
-                    listVertices.Add(t.c);
+                    case 0:
+                        listMetaTriangles.Add((vertices_target[triangles_target[i]], vertices_target[triangles_target[i+1]], vertices_target[triangles_target[i+2]]));
+                        continue;
+                    case 1:
+                        (a, b, c) = (vertices_target[triangles_target[i + 1]], vertices_target[triangles_target[i+2]], vertices_target[triangles_target[i]]); cut = 2; break;
+                    case 2:
+                        (a, b, c) = (vertices_target[triangles_target[i + 2]], vertices_target[triangles_target[i]], vertices_target[triangles_target[i + 1]]); cut = 2; break;
+                    case 3:
+                        (a, b, c) = (vertices_target[triangles_target[i + 2]], vertices_target[triangles_target[i]], vertices_target[triangles_target[i + 1]]); cut = 1; break;
+                    case 4:
+                        (a, b, c) = (vertices_target[triangles_target[i]], vertices_target[triangles_target[i + 1]], vertices_target[triangles_target[i + 2]]); cut = 2; break;
+                    case 5:
+                        (a, b, c) = (vertices_target[triangles_target[i + 1]], vertices_target[triangles_target[i + 2]], vertices_target[triangles_target[i]]); cut = 1; break;
+                    case 6:
+                        (a, b, c) = (vertices_target[triangles_target[i]], vertices_target[triangles_target[i + 1]], vertices_target[triangles_target[i + 2]]); cut = 1; break;
+                    default:
+                        continue;
                 }
-            }
+                Plane plan = new Plane(direction, position);
 
-            liquids[index_ref].vertices = listVertices.ToArray();
-            liquids[index_ref].triangles = listTriangles.ToArray();
+                if (cut == 1)
+                {
+
+                    CalculateCut1(plan,listMetaTriangles, a, b, c);
+                }
+                else
+                {
+                    CalculateCut2(plan,listMetaTriangles, a, b, c);
+                }
+
+            }
+            Vector3[] listVertices = new Vector3[listMetaTriangles.Count * 3];
+
+            for(int i = 0;i != listMetaTriangles.Count;++i)
+            {
+                int j = i * 3;
+                listVertices[j] = listMetaTriangles[i].Item1;
+                listVertices[j + 1] = listMetaTriangles[i].Item2;
+                listVertices[j + 2] = listMetaTriangles[i].Item3;
+            }
+           
+
+            liquids[index_ref] = listVertices;
         }
-        Mesh fusedMesh = Fuse(liquids);
-        liquid.vertices = fusedMesh.vertices;
-        liquid.triangles = fusedMesh.triangles;
+        Fuse(liquids,liquid);
         liquid.RecalculateNormals();
-        liquid.Optimize();
+        //liquid.Optimize();
 
     }
     void Start()
     {
         UpdateReference();
         liquid = new Mesh();
-        liquids = new Mesh[reference.Length];
-        for(int i = 0;i != reference.Length;++i)
-            liquids[i] = new Mesh();
+        liquids = new Vector3[reference.Length][];
 
         GetComponent<MeshFilter>().mesh = liquid;
         direction = (Quaternion.Inverse(transform.rotation)) * (new Vector3(0, 1, 0));
         oldSpeed = new Vector3(0, 0, 0);
         speed = new Vector3(0, 0, 0);
         shaking = 0;
-        calm = false;
         previousQuantity = -1;
 
         GetComponent<Renderer>().material.color = color;
@@ -413,10 +395,13 @@ public class Liquide : MonoBehaviour
 
     }
 
-
+    bool needUpdate;
     void Update()
     {
-        if(!calm || previousQuantity != quantity)
+        needUpdate = !needUpdate;
+        if (!needUpdate)
+            return;
+        if (!calm || previousQuantity != quantity)
         {
             previousQuantity = quantity;
             float borneMin = float.MaxValue;
@@ -434,5 +419,8 @@ public class Liquide : MonoBehaviour
             Vector3 position = direction * scale + center;
             UpdateLiquid(position, direction);
         }
+        needUpdate = false;
+
+        
     }
 }

@@ -1,0 +1,16 @@
+{
+    "rounds":
+    [
+        {
+            "type": "pool",
+            "nb_pool": 1,
+
+            "enemies": ["slime"],
+            "frequency": [10],
+            "factor": [1],
+
+            "condition": "time",
+            "time": 30
+        }
+    ]
+}

@@ -328,7 +328,6 @@ public class Liquide : MonoBehaviour
         oldSpeed = new Vector3(0, 0, 0);
         speed = new Vector3(0, 0, 0);
         shaking = 0;
-        calm = false;
         previousQuantity = -1;
 
         GetComponent<Renderer>().material.color = color;

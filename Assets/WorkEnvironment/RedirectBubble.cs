@@ -5,12 +5,12 @@ using UnityEngine;
 public class RedirectBubble : MonoBehaviour
 {
 
-    public GameObject camera;
+    public Transform targetCamera;
     public GameObject canvas;
 
 
     void Update()
     {
-        canvas.transform.LookAt(camera.transform);
+        canvas.transform.LookAt(targetCamera);
     }
 }

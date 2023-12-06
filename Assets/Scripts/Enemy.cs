@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    public string name;
+
+    public string enemyName;
     public float baseHealth;
     public float baseSpeed;
 
@@ -67,6 +68,7 @@ public class Enemy : MonoBehaviour
         else
         {
             transform.position += (objective - transform.position).normalized * baseSpeed * Time.fixedDeltaTime;
+            transform.forward = objective;
         }
     }
 }

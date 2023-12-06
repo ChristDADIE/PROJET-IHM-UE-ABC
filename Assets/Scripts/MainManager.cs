@@ -33,6 +33,11 @@ public class MainManager : MonoBehaviour
         GetComponent<LevelManager>().StartLevel();
     }
 
+    public void LevelEnded()
+    {
+
+    }
+
     
     void Update()
     {

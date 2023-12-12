@@ -4,25 +4,27 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 //using UnityEngine.InputFeatureUsage;
 
+
+[RequireComponent(typeof(DisplayLongTextInBubble))]
 public class NextTextButtonA : MonoBehaviour
 {
 
     //public InputDeviceRole controllerRole = InputDeviceRole.RightHanded;
     //public InputDevice targetDevice;
 
-    DisplayLongTextInBubble displayLongTextInBubble;
+    //DisplayLongTextInBubble displayLongTextInBubble;
     public InputActionProperty nextText;
 
     void Awake()
     {
-        displayLongTextInBubble = new DisplayLongTextInBubble();
+        //displayLongTextInBubble = new DisplayLongTextInBubble();
     }
 
     void Start()
     {
         nextText.action.performed += cxt => 
         {
-            displayLongTextInBubble.NextText();
+            GetComponent<DisplayLongTextInBubble>().NextText();
         };
     }
 

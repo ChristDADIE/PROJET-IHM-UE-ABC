@@ -5,23 +5,22 @@ using UnityEngine.UI;
 using TMPro;
 
 
-public class DisplayTextInBubble
+public class DisplayTextInBubble : MonoBehaviour
 {
-    public float cooldown = 3f; // Temps d'affichage de la bulle de texte en secondes
-    const float timeDisplay = 1000f;
+    public float cooldown = 100f; // Temps d'affichage de la bulle de texte en secondes
+    const float timeDisplay = 50f;
 
     [SerializeField] GameObject bubble;
     [SerializeField] TextMeshProUGUI textMeshPro;
-
-
-    int maxChar = 55;
+    private int maxChar = 110;
     
 
 
     void Start()
     {
         // Bulle et texte invisibles au départ
-        StopDisplay() ;
+        // à remettre après !!!
+        //StopDisplay();
 
         //Display("Lorsqu on ajoute une solution basique dans une solution acide, le pH de la solution acide augmente. Les industriels utilisent cette technique appelée neutralisation de manière à obtenir des solutions neutres (pH = 7) avant de les rejeter à l’égout. Les ions hydrogène réagissent avec les ions hydroxyde pour donner de l’eau");
     }
@@ -29,13 +28,14 @@ public class DisplayTextInBubble
 
     void StartDisplay(string text)
     {
+        bubble.SetActive(true);
+
         textMeshPro.SetText(text);
-        textMeshPro.enabled = true;
     }
 
     public void StopDisplay() 
     {
-        textMeshPro.enabled = false;
+        bubble.SetActive(false);
     }
 
     public void Display(string text)
@@ -91,4 +91,3 @@ public class DisplayTextInBubble
 
 
 }
-

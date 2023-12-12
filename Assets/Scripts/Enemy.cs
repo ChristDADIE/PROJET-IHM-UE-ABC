@@ -6,16 +6,25 @@ public class Enemy : MonoBehaviour
 {
 
     public string enemyName;
+
     public float baseHealth;
     public float baseSpeed;
-
-    public float attack;
-    public float attackSpeed;
-
+    public float baseAttack;
+    public float baseAttackSpeed;
     public float baseRange;
+    [System.NonSerialized]
+    public float health;
+    [System.NonSerialized]
+    public float speed;
+    [System.NonSerialized]
+    public float attack;
+    [System.NonSerialized]
+    public float attackSpeed;
+    [System.NonSerialized]
+    public float range;
     Vector3 objective;
 
-    LevelManager level;
+    protected LevelManager level;
     
 
 
@@ -25,41 +34,45 @@ public class Enemy : MonoBehaviour
     void Start()
     {
         isDead = false;
+       
     }
 
-    public void Setup(LevelManager level, int factor,Vector3 position)
+    virtual public void Setup(LevelManager level, float factor,Vector3 position)
     {
+        isDead = false;
         this.level = level;
-        baseHealth *= factor;
-        baseSpeed *= factor;
+        health = baseHealth*factor;
+        speed = baseSpeed*factor;
         transform.position = position;
         float size = Mathf.Sqrt(factor);
-        ((RectTransform)transform).localScale = new Vector3(size, size, size);
-        baseRange *= size;
+        RectTransform rt = (RectTransform)transform;
+        rt.localScale = new Vector3(size, size, size);
         cooldown = 0;
     }
 
     public void Damage(float amount,string type)
     {
-        baseHealth -= amount;
-        if (baseHealth <= 0)
+        health -= amount;
+        if (health <= 0)
             Death();
     }
 
-    void Death()
+    virtual protected void Death()
     {
         isDead = true;
     }
 
-    
-
-    float cooldown;
-    void FixedUpdate()
+    virtual protected void Animation()
     {
-        if((transform.position-objective).magnitude < baseRange)
+
+    }
+
+    virtual protected void Behavior()
+    {
+        if ((transform.position - objective).magnitude < baseRange)
         {
             cooldown += Time.fixedDeltaTime;
-            if(cooldown > 1/attackSpeed)
+            if (cooldown > 1 / attackSpeed)
             {
                 // deal damages
                 cooldown -= 1 / attackSpeed;
@@ -67,8 +80,21 @@ public class Enemy : MonoBehaviour
         }
         else
         {
-            transform.position += (objective - transform.position).normalized * baseSpeed * Time.fixedDeltaTime;
-            transform.forward = objective;
+            transform.position += (objective - transform.position).normalized * speed * Time.fixedDeltaTime;
+            transform.forward = objective-transform.position ;
         }
+    }
+
+    private void Update()
+    {
+        Animation();
+    }
+
+
+
+    float cooldown;
+    void FixedUpdate()
+    {
+        Behavior();
     }
 }

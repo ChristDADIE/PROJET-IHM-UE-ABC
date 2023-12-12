@@ -4,32 +4,34 @@ using UnityEngine;
 
 //using static DisplayTextInBubble;
 
+[RequireComponent(typeof(DisplayTextInBubble))]
 public class DisplayLongTextInBubble : MonoBehaviour
 {
-    DisplayTextInBubble displayTextInBubble = new DisplayTextInBubble();
 
     ArrayList textChunks;
     int chunkIndex = 0;
     int maxIndex;
+    
+    
 
     public void DisplayLongText(string text) 
     {
-        textChunks = displayTextInBubble.DivideLongText(text);
+        textChunks = GetComponent<DisplayTextInBubble>().DivideLongText(text);
         maxIndex = textChunks.Count;
-        displayTextInBubble.Display((string)textChunks[chunkIndex]);
+        GetComponent<DisplayTextInBubble>().Display((string)textChunks[chunkIndex]);
     }
 
     public void NextText() 
     {
         if (chunkIndex == maxIndex) 
         {
-            displayTextInBubble.StopDisplay();
+            GetComponent<DisplayTextInBubble>().StopDisplay();
         }
 
         else 
         {
             chunkIndex += 1;
-            displayTextInBubble.Display((string)textChunks[chunkIndex]);
+            GetComponent<DisplayTextInBubble>().Display((string)textChunks[chunkIndex]);
         }
     }
 
@@ -38,7 +40,7 @@ public class DisplayLongTextInBubble : MonoBehaviour
         if (chunkIndex > 0) 
         {
             chunkIndex -= 1;
-            displayTextInBubble.Display((string)textChunks[chunkIndex]);
+            GetComponent<DisplayTextInBubble>().Display((string)textChunks[chunkIndex]);
         }
     }
 

@@ -12,17 +12,14 @@ public class DisplayTextInBubble : MonoBehaviour
 
     [SerializeField] GameObject bubble;
     [SerializeField] TextMeshProUGUI textMeshPro;
-
-
-    int maxChar = 55;
+    private int maxChar = 55;
     
 
 
     void Start()
     {
         // Bulle et texte invisibles au départ
-        bubble.SetActive(false);
-        textMeshPro.enabled = false;
+        StopDisplay();
 
         Display("hola mi amigo como estas hoy muy bien y tu muy bine tambien muchas gracias");
     }
@@ -33,13 +30,11 @@ public class DisplayTextInBubble : MonoBehaviour
         bubble.SetActive(true);
 
         textMeshPro.SetText(text);
-        textMeshPro.enabled = true;
     }
 
     public void StopDisplay() 
     {
         bubble.SetActive(false);
-        textMeshPro.enabled = false;
     }
 
     public void Display(string text)

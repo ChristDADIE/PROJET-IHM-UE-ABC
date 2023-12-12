@@ -21,6 +21,7 @@ public class LevelManager : MonoBehaviour
             enemynames[i] = enemies[i].enemyName;
         }
         currentEnemies = new List<Enemy>();
+        SpawnEnemies("slime", 2, 1);
     }
 
     public int Id
@@ -112,9 +113,15 @@ public class LevelManager : MonoBehaviour
         for(int i = 0;i != number;++i)
         {
             Enemy enemy = Instantiate<Enemy>(enemies[index]);
-            enemy.Setup(this,factor, Random.insideUnitCircle * SpawnDistance);
+            Vector2 pos = Random.insideUnitCircle * SpawnDistance;
+            enemy.Setup(this, factor, new Vector3(pos.x, 0,pos.y)) ;
+            currentEnemies.Add(enemy);
         }
+    }
 
+    public void AddEnemies(Enemy enemy)
+    {
+        currentEnemies.Add(enemy);
     }
 
     bool AreAllEnemiesDead()
@@ -214,6 +221,8 @@ public class LevelManager : MonoBehaviour
                 break;
         }
     }
+
+
 
     void FixedUpdate()
     {

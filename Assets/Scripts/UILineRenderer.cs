@@ -60,6 +60,7 @@ public class UILineRenderer : Graphic
     }
 
     //protected override void OnFillVBO(List<UIVertex> vbo)
+    [System.Obsolete]
     protected override void OnPopulateMesh(Mesh toFill)
     {
         // requires sets of quads

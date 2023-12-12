@@ -11,6 +11,6 @@ public class RedirectBubble : MonoBehaviour
 
     void Update()
     {
-        canvas.transform.LookAt(camera.transform);
+        canvas.transform.rotation = Quaternion.LookRotation(canvas.transform.position - camera.transform.position);
     }
 }

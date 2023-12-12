@@ -18,7 +18,7 @@ public class LevelManager : MonoBehaviour
         enemynames = new string[enemies.Length];
         for(int i = 0;i != enemies.Length;++i)
         {
-            enemynames[i] = enemies[i].name;
+            enemynames[i] = enemies[i].enemyName;
         }
         currentEnemies = new List<Enemy>();
     }

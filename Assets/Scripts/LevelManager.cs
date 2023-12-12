@@ -79,7 +79,7 @@ public class LevelManager : MonoBehaviour
     {
         foreach (Enemy enemy in currentEnemies)
         {
-            Destroy(enemy);
+            Destroy(enemy.gameObject);
         }
         currentEnemies = new List<Enemy>();
     }
@@ -115,6 +115,18 @@ public class LevelManager : MonoBehaviour
             enemy.Setup(this,factor, Random.insideUnitCircle * SpawnDistance);
         }
 
+    }
+
+    public void AOEDamage(Vector3 center,float radius,float damage)
+    {
+
+        for (int i = 0; i != currentEnemies.Count; ++i)
+        {
+            if((currentEnemies[i].transform.position-center).magnitude < radius)
+            {
+                currentEnemies[i].Damage(damage, "");
+            }
+        }
     }
 
     bool AreAllEnemiesDead()
@@ -217,13 +229,19 @@ public class LevelManager : MonoBehaviour
 
     void FixedUpdate()
     {
+        List<Enemy> deads = new();
         foreach(Enemy enemy in currentEnemies) // remove dead enemies
         {
             if(enemy.isDead)
             {
-                currentEnemies.Remove(enemy);
-                Destroy(enemy);
+                deads.Add(enemy);
             }
+        }
+
+        foreach(Enemy enemy in deads)
+        {
+            currentEnemies.Remove(enemy);
+            Destroy(enemy.gameObject);
         }
 
 

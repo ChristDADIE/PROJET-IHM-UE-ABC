@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(LevelManager))]
+[RequireComponent(typeof(OutsideParticleManager))]
 public class MainManager : MonoBehaviour
 {
     public enum context
@@ -24,6 +26,13 @@ public class MainManager : MonoBehaviour
     void Start()
     {
         globalContext = context.mainMenu;
+    }
+
+    public static MainManager main;
+
+    private void Awake()
+    {
+        main = this;
     }
 
     void StartLevel(int id)

@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1423759555642376391}
   - component: {fileID: 5941767360455026979}
   - component: {fileID: 1427062291131070397}
+  - component: {fileID: 1097973040}
   m_Layer: 0
   m_Name: ComplexFiole
   m_TagString: Untagged
@@ -26,16 +27,16 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 966897017704316403}
-  m_LocalRotation: {x: 0.025874736, y: -0.0033421735, z: 0.12805961, w: 0.9914233}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.20000003, y: 0.2, z: 0.2}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3165741058563259403}
   - {fileID: 4984973918449128324}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 2.99, y: 0, z: 14.72}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &1423759555642376391
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -44,7 +45,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 966897017704316403}
   serializedVersion: 2
-  m_Mass: 1
+  m_Mass: 0.5
   m_Drag: 0
   m_AngularDrag: 0.05
   m_UseGravity: 1
@@ -83,6 +84,22 @@ MonoBehaviour:
   particleLiquid: {fileID: 3391641961036673588, guid: 154ba365419319446ac071c94186235d, type: 3}
   particlePerUnit: 25
   randomMovements: {x: 0, y: 0, z: 0}
+--- !u!114 &1097973040
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 966897017704316403}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 321897f071bbba44fb5c82e779dad415, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spawn: {fileID: 8203648571975405647, guid: 6a5f2e33b17974a42a911691b3806c59, type: 3}
+  liquid: {fileID: 960906437747608616}
+  DistanceSpawn: 3
+  minVelocityInSpawn: 2
 --- !u!1 &3285933937879796436
 GameObject:
   m_ObjectHideFlags: 0

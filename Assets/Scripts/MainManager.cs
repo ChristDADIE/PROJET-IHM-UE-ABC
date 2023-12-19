@@ -26,6 +26,7 @@ public class MainManager : MonoBehaviour
     void Start()
     {
         globalContext = context.mainMenu;
+        StartLevel(1);
     }
 
     public static MainManager main;

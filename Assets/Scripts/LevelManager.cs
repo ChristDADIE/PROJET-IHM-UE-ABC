@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+ï»¿using Newtonsoft.Json;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,6 +6,7 @@ using UnityEngine;
 public class LevelManager : MonoBehaviour
 {
     int id;
+    [SerializeField]
     TextAsset[] levels;
 
     string[] enemynames;
@@ -16,7 +17,7 @@ public class LevelManager : MonoBehaviour
     void Start()
     {
         enemynames = new string[enemies.Length];
-        for(int i = 0;i != enemies.Length;++i)
+        for (int i = 0; i != enemies.Length; ++i)
         {
             enemynames[i] = enemies[i].enemyName;
         }
@@ -40,7 +41,7 @@ public class LevelManager : MonoBehaviour
     {
 
     }
-    
+
     public class Data
     {
         public string intro { get; set; }
@@ -71,15 +72,16 @@ public class LevelManager : MonoBehaviour
     {
         SetupAssets();
         active = true;
-        ResetVariables();
         data = JsonConvert.DeserializeObject<Data>(levels[Id].text);
+        phase = 0;
+        ResetVariables();
     }
 
     void KillAll() // kill all enemies
     {
         foreach (Enemy enemy in currentEnemies)
         {
-            Destroy(enemy.gameObject);
+            Destroy(enemy);
         }
         currentEnemies = new List<Enemy>();
     }
@@ -88,45 +90,40 @@ public class LevelManager : MonoBehaviour
     {
         time = 0;
         nb = 0;
-        if (data.rounds.Count < phase)
+        if (data.rounds.Count > phase)
         {
-            cooldown = new List<float>(data.rounds[phase].enemies.Count);
+            cooldown = new List<float>();
             for (int enemyId = 0; enemyId != data.rounds[phase].enemies.Count; ++enemyId)
             {
-                cooldown[enemyId] = 0;
+                cooldown.Add(0);
             }
         }
         enemykilled = 0;
     }
 
-    void SpawnEnemies(string type,int number,int factor)
+    void SpawnEnemies(string type, int number, int factor)
     {
         int index = 0;
         while (index < enemynames.Length && enemynames[index] != type)
             index += 1;
-        if(index == enemynames.Length)
+        if (index == enemynames.Length)
         {
-            Debug.Log("Nom d'ennemi non trouvé: " + type);
+            Debug.Log("Nom d'ennemi non trouvï¿½: " + type);
         }
-
-        for(int i = 0;i != number;++i)
+        float theta = Random.Range(0, Mathf.PI * 2);
+        for (int i = 0; i != number; ++i)
         {
             Enemy enemy = Instantiate<Enemy>(enemies[index]);
-            enemy.Setup(this,factor, Random.insideUnitCircle * SpawnDistance);
+            
+            Vector2 pos = new Vector2(Mathf.Sin(theta)+Random.Range(-0.2f,0.2f),Mathf.Cos(theta)+Random.Range(-0.2f, 0.2f)) * SpawnDistance;
+            enemy.Setup(this, factor, new Vector3(pos.x, 0, pos.y));
+            currentEnemies.Add(enemy);
         }
-
     }
 
-    public void AOEDamage(Vector3 center,float radius,float damage)
+    public void AddEnemies(Enemy enemy)
     {
-
-        for (int i = 0; i != currentEnemies.Count; ++i)
-        {
-            if((currentEnemies[i].transform.position-center).magnitude < radius)
-            {
-                currentEnemies[i].Damage(damage, "");
-            }
-        }
+        currentEnemies.Add(enemy);
     }
 
     bool AreAllEnemiesDead()
@@ -136,7 +133,7 @@ public class LevelManager : MonoBehaviour
 
     void LevelUpdate() // called approximately one time per fixed update
     {
-        if(phase >= data.rounds.Count)
+        if (phase >= data.rounds.Count)
         {
             active = false;
             GetComponent<MainManager>().LevelEnded();
@@ -147,7 +144,7 @@ public class LevelManager : MonoBehaviour
         {
             cooldown[enemyId] += Time.fixedDeltaTime;
         }
-        
+
         if (data.rounds[phase].condition == "time")
         {
             if (time > data.rounds[phase].time)
@@ -163,11 +160,11 @@ public class LevelManager : MonoBehaviour
         switch (data.rounds[phase].type)
         {
             case "pool":
-                if(nb < data.rounds[phase].nb_pool)
+                if (nb < data.rounds[phase].nb_pool)
                 {
-                    for(int enemyId = 0; enemyId != data.rounds[phase].enemies.Count;++enemyId)
+                    for (int enemyId = 0; enemyId != data.rounds[phase].enemies.Count; ++enemyId)
                     {
-                        if(cooldown[enemyId] > data.rounds[phase].frequency[enemyId])
+                        if (cooldown[enemyId] > data.rounds[phase].frequency[enemyId])
                         {
                             cooldown[enemyId] = 0;
                             SpawnEnemies(data.rounds[phase].enemies[enemyId], data.rounds[phase].number[enemyId], data.rounds[phase].factor[enemyId]);
@@ -176,9 +173,9 @@ public class LevelManager : MonoBehaviour
                     }
                 }
 
-                if(nb >= data.rounds[phase].nb_pool)
+                if (nb >= data.rounds[phase].nb_pool)
                 {
-                    if(AreAllEnemiesDead())
+                    if (AreAllEnemiesDead())
                     {
                         phase += 1;
                         ResetVariables();
@@ -198,7 +195,7 @@ public class LevelManager : MonoBehaviour
                         SpawnEnemies(data.rounds[phase].enemies[enemyId], data.rounds[phase].number[enemyId], data.rounds[phase].factor[enemyId]);
                     }
                 }
-                if(enemykilled > data.rounds[phase].nb)
+                if (enemykilled > data.rounds[phase].nb)
                 {
                     phase += 1;
                     ResetVariables();
@@ -208,7 +205,7 @@ public class LevelManager : MonoBehaviour
                 }
                 break;
             case "boss":
-                if(time == 0)
+                if (time == 0)
                 {
                     for (int enemyId = 0; enemyId != data.rounds[phase].enemies.Count; ++enemyId)
                     {
@@ -227,12 +224,14 @@ public class LevelManager : MonoBehaviour
         }
     }
 
+
+
     void FixedUpdate()
     {
         List<Enemy> deads = new();
-        foreach(Enemy enemy in currentEnemies) // remove dead enemies
+        foreach (Enemy enemy in currentEnemies) // remove dead enemies
         {
-            if(enemy.isDead)
+            if (enemy.isDead)
             {
                 deads.Add(enemy);
             }
@@ -241,7 +240,7 @@ public class LevelManager : MonoBehaviour
         foreach(Enemy enemy in deads)
         {
             currentEnemies.Remove(enemy);
-            Destroy(enemy.gameObject);
+            Destroy(enemy);
         }
 
 

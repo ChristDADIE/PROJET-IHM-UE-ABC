@@ -18,6 +18,7 @@
             "type": "wave",
 
             "enemies": ["slime"],
+            "number": [1],
             "frequency": [2],
             "factor": [1],
 

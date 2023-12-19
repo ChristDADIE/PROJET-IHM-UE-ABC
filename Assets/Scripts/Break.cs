@@ -27,15 +27,17 @@ public class Break : MonoBehaviour
 
     void breaking()
     {
-        Splash splash = Instantiate(spawn);
-        splash.transform.position = transform.position;
-        splash.GetComponent<ParticleSystemRenderer>().material.color = liquid.Property.color;
-#pragma warning disable CS0618
-        splash.GetComponent<ParticleSystem>().startSpeed = 4 * liquid.Property.quantity;
-        splash.GetComponent<ParticleSystem>().startSize = liquid.Property.quantity;
-#pragma warning restore CS0618
+        if(liquid.Property.quantity > 0.2)
+        {
+            Splash splash = Instantiate(spawn);
+            splash.transform.position = transform.position;
+            splash.GetComponent<ParticleSystemRenderer>().material.color = liquid.Property.color;
+            float scale = liquid.Property.quantity * 2;
+            ((RectTransform)splash.transform).localScale = new Vector3(scale, scale, scale);
+            splash.GetComponent<PlayerAttack>().ScaleMode(scale);
+        }
 
-        MainManager.main.GetComponent<LevelManager>().AOEDamage(transform.position, liquid.Property.quantity*2, 200);
+
         Destroy(this.gameObject);
         
     }
